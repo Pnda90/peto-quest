@@ -11,6 +11,9 @@ export class AudioSystem {
     private nextNoteTime = 0;
     private currentTempoMultiplier = 1;
 
+    // Cache for noise buffer to avoid reallocation on mobile
+    private noiseBuffer: AudioBuffer | null = null;
+
     // Catchy chiptune melody (C minor pentatonic + driving bass)
     // 0 means rest
     private bgmSequence = [
@@ -41,6 +44,14 @@ export class AudioSystem {
 
         window.addEventListener('click', initAudio);
         window.addEventListener('keydown', initAudio);
+
+        // Pre-generate noise buffer for performance
+        this.prepareNoiseBuffer();
+    }
+
+    private prepareNoiseBuffer() {
+        // We'll do this when context is available, or just create a temporary one if needed
+        // But better to wait for AudioContext
     }
 
     public toggleMute(): boolean {
@@ -231,30 +242,33 @@ export class AudioSystem {
     private playNoise(duration: number) {
         if (!this.audioCtx) return;
 
-        const bufferSize = this.audioCtx!.sampleRate * duration;
-        const buffer = this.audioCtx!.createBuffer(1, bufferSize, this.audioCtx!.sampleRate);
-        const data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
+        if (!this.noiseBuffer) {
+            const bufferSize = this.audioCtx.sampleRate * 2; // 2 seconds of noise
+            this.noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
+            const data = this.noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
         }
 
-        const noise = this.audioCtx!.createBufferSource();
-        noise.buffer = buffer;
+        const noise = this.audioCtx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        noise.loop = true;
 
         // Filter noise
-        const filter = this.audioCtx!.createBiquadFilter();
+        const filter = this.audioCtx.createBiquadFilter();
         filter.type = 'lowpass';
         filter.frequency.value = 1000;
 
-        const gainNode = this.audioCtx!.createGain();
-        gainNode.gain.setValueAtTime(0.2, this.audioCtx!.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioCtx!.currentTime + duration);
+        const gainNode = this.audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + duration);
 
         noise.connect(filter);
         filter.connect(gainNode);
-        gainNode.connect(this.audioCtx!.destination);
+        gainNode.connect(this.audioCtx.destination);
 
         noise.start();
+        noise.stop(this.audioCtx.currentTime + duration);
     }
 }

@@ -49,7 +49,7 @@ export class GameScene extends Phaser.Scene {
     // Powerup states
     private isInvincible = false;
     private isMagnet = false;
-    private invincibleGlow!: Phaser.GameObjects.Graphics;
+    private invincibleGlow!: Phaser.GameObjects.Image;
 
     // Timers
     private obstacleSpawnTimer = 0;
@@ -60,8 +60,8 @@ export class GameScene extends Phaser.Scene {
     private distanceText!: Phaser.GameObjects.Text;
     private coinsText!: Phaser.GameObjects.Text;
     private multiplierText!: Phaser.GameObjects.Text;
-    private gasBarBg!: Phaser.GameObjects.Graphics;
-    private gasBar!: Phaser.GameObjects.Graphics;
+    private gasBarBg!: Phaser.GameObjects.Rectangle;
+    private gasBar!: Phaser.GameObjects.Rectangle;
     private gasText!: Phaser.GameObjects.Text;
     private vignette!: Phaser.GameObjects.Graphics;
 
@@ -129,7 +129,7 @@ export class GameScene extends Phaser.Scene {
             angle: { min: -120, max: -60 },
             gravityY: -200,
             quantity: 1,
-            frequency: 50
+            frequency: this.scale.width < 600 ? 100 : 50 // Less frequent particles on mobile
         });
 
         // Player setup
@@ -147,8 +147,10 @@ export class GameScene extends Phaser.Scene {
             this.player.setTint(0xffdd00);
         }
 
-        // Invincible Glow
-        this.invincibleGlow = this.add.graphics();
+        // Invincible Glow - Use static texture
+        this.invincibleGlow = this.add.image(0, 0, 'glow');
+        this.invincibleGlow.setTint(0xffff00);
+        this.invincibleGlow.setAlpha(0.4);
         this.invincibleGlow.setDepth(9);
         this.invincibleGlow.setVisible(false);
 
@@ -175,20 +177,11 @@ export class GameScene extends Phaser.Scene {
         this.coinsText = this.add.text(w - 20, 50, 'Beans: 0', { fontSize: '20px', color: '#ffcc00' }).setOrigin(1, 0).setDepth(100);
         this.distanceText = this.add.text(w - 20, 20, 'Dist: 0m', { fontSize: '20px', color: '#fff' }).setOrigin(1, 0).setDepth(100);
 
-        // Gas Bar UI
-        this.gasBarBg = this.add.graphics().setDepth(101);
-        this.gasBarBg.fillStyle(0x000000, 0.5);
-        this.gasBarBg.fillRoundedRect(w / 2 - 100, 20, 200, 20, 10);
+        // Gas Bar UI - Use Rectangles instead of Graphics to avoid redraws
+        this.gasBarBg = this.add.rectangle(w / 2, 30, 200, 20, 0x000000, 0.5).setDepth(101);
+        this.gasBar = this.add.rectangle(w / 2 - 100, 30, 0, 20, 0x00ff00).setOrigin(0, 0.5).setDepth(102);
 
-        this.gasBar = this.add.graphics().setDepth(102);
-
-        this.gasText = this.add.text(w / 2, 45, 'GAS GAUGE', {
-            fontSize: '14px',
-            color: '#00ff00',
-            fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(103);
-
-        // Vignette (for high speed/turbo)
+        // Graphics for static UI elements like vignette
         this.vignette = this.add.graphics().setDepth(1000).setScrollFactor(0);
         this.vignette.clear();
         this.vignette.fillStyle(0x000000, 0.5);
@@ -579,9 +572,7 @@ export class GameScene extends Phaser.Scene {
 
         // Invincible Glow follows player
         if (this.isInvincible) {
-            this.invincibleGlow.clear();
-            this.invincibleGlow.fillStyle(0xffff00, 0.4);
-            this.invincibleGlow.fillCircle(this.player.x, this.player.y, 60);
+            this.invincibleGlow.setPosition(this.player.x, this.player.y);
         }
 
         // Scrolling backgrounds
@@ -603,21 +594,17 @@ export class GameScene extends Phaser.Scene {
         }
 
         // Gas Bar Update
-        const w = this.scale.width;
-        this.gasBar.clear();
         const gasFill = (this.gasGauge / this.maxGas) * 200;
+        this.gasBar.width = gasFill;
 
         if (this.gasGauge >= this.maxGas) {
-            // Flash if ready
             const alpha = 0.5 + Math.sin(time / 100) * 0.5;
-            this.gasBar.fillStyle(0x00ff00, alpha);
+            this.gasBar.setFillStyle(0x00ff00, alpha);
             this.gasText.setText('PRESS SPACE FOR TURBO!');
         } else {
-            this.gasBar.fillStyle(0x00ff00, 1);
+            this.gasBar.setFillStyle(0x00ff00, 1);
             this.gasText.setText('GAS GAUGE');
         }
-
-        this.gasBar.fillRoundedRect(w / 2 - 100, 20, gasFill, 20, 10);
 
         // Combo Logic
         if (this.comboTimer > 0) {
