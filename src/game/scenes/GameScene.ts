@@ -181,6 +181,12 @@ export class GameScene extends Phaser.Scene {
         this.gasBarBg = this.add.rectangle(w / 2, 30, 200, 20, 0x000000, 0.5).setDepth(101);
         this.gasBar = this.add.rectangle(w / 2 - 100, 30, 0, 20, 0x00ff00).setOrigin(0, 0.5).setDepth(102);
 
+        this.gasText = this.add.text(w / 2, 45, 'GAS GAUGE', {
+            fontSize: '14px',
+            color: '#00ff00',
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(103);
+
         // Graphics for static UI elements like vignette
         this.vignette = this.add.graphics().setDepth(1000).setScrollFactor(0);
         this.vignette.clear();

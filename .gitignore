@@ -4,4 +4,4 @@ dist
 *.local
 .gemini
 /tools/asset-builder/*.png
-/public/generated/*.png
+
