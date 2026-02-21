@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peto Quest - Asset Builder</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #222;
+            color: #eee;
+            padding: 20px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .preview-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .asset-card {
+            background: #333;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        canvas {
+            background: transparent;
+            background-image: linear-gradient(45deg, #444 25%, transparent 25%),
+                linear-gradient(-45deg, #444 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #444 75%),
+                linear-gradient(-45deg, transparent 75%, #444 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 1px solid #555;
+            border-radius: 4px;
+        }
+
+        .log {
+            margin-top: 20px;
+            padding: 10px;
+            background: #111;
+            font-family: monospace;
+            height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Peto Quest - Procedural Asset Builder</h1>
+    <p>This tool generates the cartoon assets (SpriteSheets and Backgrounds) and allows you to save them to the
+        <code>/public/generated/</code> folder.
+    </p>
+
+    <div class="controls">
+        <button id="btn-generate">1. Generate Previews</button>
+        <button id="btn-download" disabled>2. Download All as PNG</button>
+    </div>
+
+    <div class="preview-grid" id="preview-container"></div>
+
+    <div class="log" id="log-container">Ready.</div>
+
+    <script type="module" src="./assetBuilder.ts"></script>
+</body>
+
+</html>
