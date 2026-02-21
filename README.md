@@ -67,4 +67,17 @@ Il gioco è configurato come **PWA** (Progressive Web App).
 
 ---
 
+## 🧘‍♂️ Vibe Coding Flow
+
+Questo progetto è un esempio di **Vibe Coding Flow**, un approccio moderno allo sviluppo software dove la visione creativa viene tradotta in codice attraverso una collaborazione fluida tra lo sviluppatore e l'Intelligenza Artificiale.
+
+La realizzazione di questo gioco è stata resa possibile grazie all'utilizzo di **[AgentiPRO](https://github.com/Pnda90/AgentiPRO)**, un framework di agenti IA avanzati creato da Gianluca Bernardo. Nello specifico, è stato utilizzato lo strumento `game-developer.md` per guidare l'intero ciclo di vita dello sviluppo: dalla concezione delle meccaniche alla risoluzione dei bug critici su iOS.
+
+---
+
+## 📄 Licenza
+
+Questo progetto è rilasciato sotto licenza MIT. Consulta il file [LICENSE](LICENSE) per i dettagli.
+
 *Continua a correre, continua a... gasare!* 🌬️💨
+
