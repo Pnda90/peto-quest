@@ -100,7 +100,8 @@ export class GameScene extends Phaser.Scene {
         }
         // onion bonus is handled in magnet logic below
 
-        this.audioSystem = new AudioSystem();
+        this.audioSystem = AudioSystem.getInstance();
+        this.audioSystem.resume();
         this.audioSystem.startBGM();
 
         // Backgrounds (Parallax)

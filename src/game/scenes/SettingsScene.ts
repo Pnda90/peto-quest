@@ -12,7 +12,8 @@ export class SettingsScene extends Phaser.Scene {
     }
 
     create() {
-        this.audioSystem = new AudioSystem();
+        this.audioSystem = AudioSystem.getInstance();
+        this.audioSystem.resume();
         const w = this.scale.width;
         const h = this.scale.height;
 

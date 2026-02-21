@@ -1,6 +1,7 @@
 import { SaveManager, SaveData } from './SaveManager';
 
 export class AudioSystem {
+    private static instance: AudioSystem;
     private audioCtx: AudioContext | null = null;
     private isMuted: boolean = false;
 
@@ -27,26 +28,53 @@ export class AudioSystem {
         466.16, 0, 466.16, 392.00, 0, 349.23, 311.13, 0
     ];
 
-    constructor() {
+    private constructor() {
         this.isMuted = !SaveManager.getSaveData().audioEnabled;
+    }
 
-        // Try to initialize audio context on user interaction
+    public static getInstance(): AudioSystem {
+        if (!AudioSystem.instance) {
+            AudioSystem.instance = new AudioSystem();
+        }
+        return AudioSystem.instance;
+    }
+
+    public init(): void {
+        if (this.audioCtx) return;
+
         const initAudio = () => {
             if (!this.audioCtx) {
-                this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                const AudioCtxClass = (window as any).AudioContext || (window as any).webkitAudioContext;
+                this.audioCtx = new AudioCtxClass();
             }
-            if (this.audioCtx.state === 'suspended') {
-                this.audioCtx.resume();
+            if (this.audioCtx!.state === 'suspended') {
+                this.audioCtx!.resume();
             }
+
+            // Prime iOS audio with a silent buffer
+            const buffer = this.audioCtx!.createBuffer(1, 1, 22050);
+            const source = this.audioCtx!.createBufferSource();
+            source.buffer = buffer;
+            source.connect(this.audioCtx!.destination);
+            source.start(0);
+
             window.removeEventListener('click', initAudio);
+            window.removeEventListener('touchstart', initAudio);
             window.removeEventListener('keydown', initAudio);
         };
 
         window.addEventListener('click', initAudio);
+        window.addEventListener('touchstart', initAudio);
         window.addEventListener('keydown', initAudio);
 
         // Pre-generate noise buffer for performance
         this.prepareNoiseBuffer();
+    }
+
+    public resume(): void {
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
     }
 
     private prepareNoiseBuffer() {

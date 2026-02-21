@@ -11,7 +11,9 @@ export class SelectionScene extends Phaser.Scene {
 
     create() {
         this.cameras.main.fadeIn(1000, 0, 0, 0);
-        this.audioSystem = new AudioSystem();
+        this.audioSystem = AudioSystem.getInstance();
+        this.audioSystem.init(); // Just in case
+        this.audioSystem.resume();
         const w = this.scale.width;
         const h = this.scale.height;
 

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CONSTS } from '../consts';
+import { AudioSystem } from '../systems/AudioSystem';
 
 export class BootScene extends Phaser.Scene {
     constructor() {
@@ -7,6 +8,10 @@ export class BootScene extends Phaser.Scene {
     }
 
     create() {
+        // Initialize AudioSystem Singleton
+        const audio = AudioSystem.getInstance();
+        audio.init();
+
         // Create a glow texture for powerups to avoid redraws in update loop
         const graphics = this.add.graphics();
         graphics.fillStyle(0xffffff, 1);
