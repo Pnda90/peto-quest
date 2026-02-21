@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { CONSTS } from '../consts';
 import { SaveManager } from '../systems/SaveManager';
 import { MissionManager } from '../systems/MissionManager';
+import { AudioSystem } from '../systems/AudioSystem';
 
 export class MenuScene extends Phaser.Scene {
     constructor() {
@@ -91,6 +92,7 @@ export class MenuScene extends Phaser.Scene {
                 duration: 100,
                 yoyo: true,
                 onComplete: () => {
+                    AudioSystem.getInstance().resume();
                     this.scene.start(CONSTS.SCENES.SELECTION);
                 }
             });
@@ -143,6 +145,7 @@ export class MenuScene extends Phaser.Scene {
                 duration: 100,
                 yoyo: true,
                 onComplete: () => {
+                    AudioSystem.getInstance().resume();
                     this.scene.start('ShopScene');
                 }
             });
@@ -168,6 +171,7 @@ export class MenuScene extends Phaser.Scene {
         rankingBtnContainer.setInteractive({ useHandCursor: true });
 
         rankingBtnContainer.on('pointerup', () => {
+            AudioSystem.getInstance().resume();
             this.scene.start(CONSTS.SCENES.LEADERBOARD);
         });
 
