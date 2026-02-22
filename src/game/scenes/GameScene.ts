@@ -120,6 +120,14 @@ export class GameScene extends Phaser.Scene {
         this.laneLines.push(line);
       }
     }
+    // Dust
+    this.dustEmitter = this.add.particles(0, 0, 'particle_puff', {
+      scale: { start: 0.5, end: 0 },
+      alpha: { start: 0.5, end: 0 },
+      lifespan: 400,
+      gravityY: 0,
+      frequency: -1 // Manual emission
+    });
 
     this.createBeanBadgeTexture();
 
