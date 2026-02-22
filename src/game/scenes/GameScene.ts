@@ -121,14 +121,7 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // Dust
-    this.dustEmitter = this.add.particles(0, 0, 'particle_puff', {
-      scale: { start: 0.5, end: 0 },
-      alpha: { start: 0.5, end: 0 },
-      lifespan: 400,
-      gravityY: 0,
-      frequency: -1 // Manual emission
-    });
+    this.createBeanBadgeTexture();
 
     // Player setup
     const playerX = centerX + CONSTS.LANE_POSITIONS[this.currentLane];
@@ -209,6 +202,44 @@ export class GameScene extends Phaser.Scene {
     // Dynamic Missions Setup
     this.createChallengeUI();
     this.spawnNewChallenge();
+  }
+
+  private createBeanBadgeTexture() {
+    const key = 'bean_badge';
+    if (this.textures.exists(key)) this.textures.remove(key);
+
+    const g = this.add.graphics();
+    const mainColor = 0x8B4513; // Brown
+    const size = 64;
+    const cx = size / 2;
+    const cy = size / 2;
+
+    // 1. Outer Glow/Shadow
+    g.fillStyle(mainColor, 0.2);
+    g.fillCircle(cx, cy, 30);
+
+    // 2. Black Base (Like selection screen)
+    g.fillStyle(0x000000, 1);
+    g.fillCircle(cx, cy, 26);
+
+    // 3. Brown Border
+    g.lineStyle(3, mainColor, 1);
+    g.strokeCircle(cx, cy, 26);
+
+    // 4. Subtle Inner Highlight
+    g.lineStyle(1, 0xffffff, 0.2);
+    g.strokeCircle(cx, cy, 22);
+
+    // 5. Stylized Bean Silhouette (Mini version)
+    g.fillStyle(mainColor, 1);
+    g.fillEllipse(cx, cy, 18, 12);
+
+    // Small Glossy Dot on Bean
+    g.fillStyle(0xffffff, 0.5);
+    g.fillCircle(cx - 5, cy - 3, 3);
+
+    g.generateTexture(key, size, size);
+    g.destroy();
   }
 
   private setupInputListeners() {
@@ -377,17 +408,16 @@ export class GameScene extends Phaser.Scene {
         const coin = this.coins.create(
           x,
           y - i * 80,
-          CONSTS.KEYS.COIN
+          'bean_badge'
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
-        coin.setScale(0.12);
-        coin.setTint(0x8B4513); // Brown tint for beans
+        coin.setScale(0.9); // Perfect size for clarity without grouping
 
-        // Simple rotation as before
+        // Harmonious simple animation
         this.tweens.add({
           targets: coin,
           angle: 360,
-          duration: 1000,
+          duration: 2000,
           repeat: -1
         });
       }
