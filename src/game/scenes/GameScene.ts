@@ -384,7 +384,8 @@ export class GameScene extends Phaser.Scene {
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
         coin.setScale(0.12); // Slightly larger for visibility
-        coin.setBlendMode(Phaser.BlendModes.ADD); // Glow & Transparency
+        coin.setTint(0x8B4513); // Brown color for beans
+        // Removed ADD blend mode to make brown tint more visible
 
         // Rotating animation
         this.tweens.add({
@@ -417,12 +418,6 @@ export class GameScene extends Phaser.Scene {
     const bonus = this.selectedFoodId === 'chili' ? 2 : 1;
     this.coinsCollected += CONSTS.COIN_VALUE * bonus;
     this.score += 10 * this.scoreMultiplier * bonus; // Bonus score for collecting
-
-    // Cheering based on combo
-    if (this.scoreMultiplier > 1 && this.time.now > this.nextCheerTime) {
-      this.audioSystem.playCheer(this.scoreMultiplier * 0.2);
-      this.nextCheerTime = this.time.now + 1000;
-    }
 
     // Mission tracking
     SaveManager.updateMissionProgress('collect_beans_total', 1);
