@@ -49,6 +49,11 @@ export class GameScene extends Phaser.Scene {
   private floraRight!: Phaser.GameObjects.Particles.ParticleEmitter;
   private nextCheerTime = 0;
 
+  // Dynamic Missions
+  private activeChallenge: { type: string; goal: number; progress: number; description: string } | null = null;
+  private challengeText!: Phaser.GameObjects.Text;
+  private challengeContainer!: Phaser.GameObjects.Container;
+
   // Timers
   private obstacleSpawnTimer = 0;
   private itemSpawnTimer = 0;
@@ -207,6 +212,10 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.obstacles, this.hitObstacle, undefined, this);
     this.physics.add.overlap(this.player, this.coins, this.collectCoin, undefined, this);
     this.physics.add.overlap(this.player, this.powerups, this.collectPowerup, undefined, this);
+
+    // Dynamic Missions Setup
+    this.createChallengeUI();
+    this.spawnNewChallenge();
   }
 
   private setupInputListeners() {
@@ -241,31 +250,33 @@ export class GameScene extends Phaser.Scene {
 
     // Left side flora
     this.floraLeft = this.add.particles(50, 0, 'particle_puff', {
-      x: { min: 0, max: 100 },
+      x: { min: -50, max: 100 },
       y: { min: 0, max: h },
-      scale: { min: 0.5, max: 1.2 },
+      scale: { min: 0.8, max: 2.0 },
       tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 100,
-      lifespan: 2000,
-      speedY: { min: 20, max: 80 },
-      alpha: { min: 0.6, max: 0.9 },
-      rotate: { min: 0, max: 360 }
+      frequency: 50,
+      lifespan: 1500,
+      speedY: { min: 50, max: 150 },
+      alpha: { min: 1.0, max: 1.0 }, // Fully solid
+      rotate: { min: 0, max: 360 },
+      blendMode: 'ADD' // Glowing effect
     });
-    this.floraLeft.setDepth(1);
+    this.floraLeft.setDepth(10); // Far above background
 
     // Right side flora
     this.floraRight = this.add.particles(w - 50, 0, 'particle_puff', {
-      x: { min: w - 100, max: w },
+      x: { min: w - 100, max: w + 50 },
       y: { min: 0, max: h },
-      scale: { min: 0.5, max: 1.2 },
+      scale: { min: 0.8, max: 2.0 },
       tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 100,
-      lifespan: 2000,
-      speedY: { min: 20, max: 80 },
-      alpha: { min: 0.6, max: 0.9 },
-      rotate: { min: 0, max: 360 }
+      frequency: 50,
+      lifespan: 1500,
+      speedY: { min: 50, max: 150 },
+      alpha: { min: 1.0, max: 1.0 },
+      rotate: { min: 0, max: 360 },
+      blendMode: 'ADD'
     });
-    this.floraRight.setDepth(1);
+    this.floraRight.setDepth(10);
   }
 
   private switchLane(newLane: LaneIndex) {
@@ -308,6 +319,9 @@ export class GameScene extends Phaser.Scene {
           this.player.y = startY; // Ensure exact landing
           this.player.setScale(0.8);
           this.dustEmitter.start();
+
+          // Progress jump challenge
+          this.progressChallenge('jump');
         }
       }
     });
@@ -408,7 +422,26 @@ export class GameScene extends Phaser.Scene {
           CONSTS.KEYS.COIN
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
-        coin.setScale(0.1); // Scale down 640x640 asset to 64x64
+        coin.setScale(0.12); // Slightly larger for visibility
+        coin.setBlendMode(Phaser.BlendModes.ADD); // Glow & Transparency
+
+        // Rotating animation
+        this.tweens.add({
+          targets: coin,
+          angle: 360,
+          duration: 1000,
+          repeat: -1
+        });
+
+        // Pulsing animation
+        this.tweens.add({
+          targets: coin,
+          scale: 0.14,
+          duration: 400,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
       }
     }
   }
@@ -420,8 +453,9 @@ export class GameScene extends Phaser.Scene {
 
     this.audioSystem.playCoin();
 
-    this.coinsCollected += CONSTS.COIN_VALUE;
-    this.score += 10 * this.scoreMultiplier; // Bonus score for collecting
+    const bonus = this.selectedFoodId === 'chili' ? 2 : 1;
+    this.coinsCollected += CONSTS.COIN_VALUE * bonus;
+    this.score += 10 * this.scoreMultiplier * bonus; // Bonus score for collecting
 
     // Cheering based on combo
     if (this.scoreMultiplier > 1 && this.time.now > this.nextCheerTime) {
@@ -447,6 +481,7 @@ export class GameScene extends Phaser.Scene {
     // Increase multiplier
     this.scoreMultiplier = Math.min(this.scoreMultiplier + 1, 10);
     this.comboTimer = 2000; // 2 seconds to keep combo
+    this.progressChallenge('collect');
 
     this.coinsText.setText(`Fagioli: ${this.coinsCollected}`);
     this.multiplierText.setText(`x${this.scoreMultiplier}`);
@@ -649,7 +684,10 @@ export class GameScene extends Phaser.Scene {
         const obj = child as Phaser.Physics.Arcade.Sprite;
         if (obj.y > this.scale.height + 100) {
           obj.destroy();
-          if (checkBonus) this.score += 50; // Bonus score for dodging
+          if (checkBonus) {
+            this.score += 50; // Bonus score for dodging
+            this.progressChallenge('dodge');
+          }
         } else {
           // Adjust velocity in case speed changed and object is not magnetized
           if (!(group === this.coins && this.isMagnet)) {
@@ -746,5 +784,70 @@ export class GameScene extends Phaser.Scene {
     this.bg1.setTint(stage.bg1);
     this.bg2.setTint(stage.bg2);
     this.laneLines.forEach((line) => line.setTint(stage.lanes));
+  }
+
+  // --- Dynamic Challenge Methods ---
+
+  private createChallengeUI() {
+    const w = this.scale.width;
+    this.challengeContainer = this.add.container(w - 180, 100).setDepth(200);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.6);
+    bg.fillRoundedRect(-150, 0, 160, 50, 10);
+    bg.lineStyle(2, 0x00ff00, 1);
+    bg.strokeRoundedRect(-150, 0, 160, 50, 10);
+    this.challengeContainer.add(bg);
+
+    this.challengeText = this.add.text(-140, 10, 'Missione...', {
+      fontSize: '14px',
+      color: '#00ff00',
+      fontStyle: 'bold',
+      wordWrap: { width: 140 }
+    });
+    this.challengeContainer.add(this.challengeText);
+  }
+
+  private spawnNewChallenge() {
+    const types = [
+      { type: 'collect', goal: 20, desc: 'Raccogli 20 fagioli' },
+      { type: 'dodge', goal: 10, desc: 'Schiva 10 ostacoli' },
+      { type: 'jump', goal: 5, desc: 'Salta 5 volte' }
+    ];
+    const pick = types[Phaser.Math.Between(0, types.length - 1)];
+    this.activeChallenge = { ...pick, progress: 0, description: pick.desc };
+    this.updateChallengeUI();
+  }
+
+  private updateChallengeUI() {
+    if (!this.activeChallenge) return;
+    this.challengeText.setText(`${this.activeChallenge.description}\n(${this.activeChallenge.progress}/${this.activeChallenge.goal})`);
+  }
+
+  private progressChallenge(type: string, amount: number = 1) {
+    if (!this.activeChallenge || this.activeChallenge.type !== type) return;
+    this.activeChallenge.progress += amount;
+    this.updateChallengeUI();
+
+    if (this.activeChallenge.progress >= this.activeChallenge.goal) {
+      this.completeChallenge();
+    }
+  }
+
+  private completeChallenge() {
+    this.audioSystem.playPowerup();
+    this.score += 500;
+    this.createScorePopup(this.scale.width - 100, 100, '+500 MISSIONE');
+
+    // Flash effect on UI
+    this.tweens.add({
+      targets: this.challengeContainer,
+      scale: 1.2,
+      yoyo: true,
+      duration: 200
+    });
+
+    this.activeChallenge = null;
+    this.time.delayedCall(3000, () => this.spawnNewChallenge());
   }
 }

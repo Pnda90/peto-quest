@@ -69,6 +69,13 @@ export const CONSTS = {
       bonus: 'Magnete ++',
       color: '#ffffff',
       description: 'Un odore così forte che attrae tutto.'
+    },
+    {
+      id: 'chili',
+      name: 'Peperoncino',
+      bonus: 'Moltiplicatore X2',
+      color: '#ff4400',
+      description: 'Piccantezza estrema per punti doppi.'
     }
   ],
   // Entity Keys

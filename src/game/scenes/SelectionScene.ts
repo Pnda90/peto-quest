@@ -36,10 +36,11 @@ export class SelectionScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Render Food Options
-    let startY = 280;
+    // Render Food Options in 3 columns
+    const spacing = 260;
+    const startX = w / 2 - spacing;
     CONSTS.FOODS.forEach((food, index) => {
-      this.createFoodItem(w / 2, startY + index * 180, food);
+      this.createFoodItem(startX + index * spacing, h / 2, food);
     });
 
     // Back Button
@@ -58,44 +59,69 @@ export class SelectionScene extends Phaser.Scene {
 
   private createFoodItem(x: number, y: number, food: any) {
     const container = this.add.container(x, y);
+    const cardW = 240;
+    const cardH = 380;
 
     // Card Bg
     const bg = this.add.graphics();
     bg.fillStyle(0x222222, 1);
     bg.lineStyle(2, 0x444444, 1);
-    bg.fillRoundedRect(-250, -70, 500, 140, 15);
-    bg.strokeRoundedRect(-250, -70, 500, 140, 15);
+    bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+    bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
     container.add(bg);
 
+    // Food Icon (Procedural placeholder that looks like an icon)
+    const iconBase = this.add.graphics();
+    iconBase.fillStyle(0x333333, 1);
+    iconBase.fillCircle(0, -100, 60);
+    iconBase.lineStyle(3, food.color, 1);
+    iconBase.strokeCircle(0, -100, 60);
+    container.add(iconBase);
+
+    // Emoji or Symbol for icon
+    const emojiMap: { [key: string]: string } = {
+      beans: '🫘',
+      onion: '🧅',
+      chili: '🌶️'
+    };
+    const iconEmoji = this.add.text(0, -100, emojiMap[food.id] || '❓', {
+      fontSize: '64px'
+    }).setOrigin(0.5);
+    container.add(iconEmoji);
+
     // Food Name
-    const nameText = this.add.text(-120, -40, food.name, {
-      fontSize: '28px',
+    const nameText = this.add.text(0, -10, food.name, {
+      fontSize: '24px',
       color: food.color,
-      fontStyle: 'bold'
-    });
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: cardW - 20 }
+    }).setOrigin(0.5, 0);
     container.add(nameText);
 
     // Bonus Tag
     const bonusText = this.add
-      .text(120, -35, food.bonus, {
-        fontSize: '18px',
+      .text(0, 50, food.bonus, {
+        fontSize: '16px',
         color: '#000',
         backgroundColor: food.color,
-        padding: { x: 5, y: 2 }
+        padding: { x: 8, y: 4 },
+        fontStyle: 'bold'
       })
-      .setOrigin(0, 0);
+      .setOrigin(0.5, 0);
     container.add(bonusText);
 
     // Description
-    const descText = this.add.text(-120, 5, food.description, {
-      fontSize: '16px',
-      color: '#cccccc',
-      wordWrap: { width: 350 }
-    });
+    const descText = this.add.text(0, 100, food.description, {
+      fontSize: '14px',
+      color: '#aaaaaa',
+      wordWrap: { width: cardW - 40 },
+      align: 'center'
+    }).setOrigin(0.5, 0);
     container.add(descText);
 
     // Interaction
-    container.setSize(500, 140);
+    container.setSize(cardW, cardH);
     container.setInteractive({ useHandCursor: true });
 
     container.on('pointerover', () => {
@@ -103,8 +129,8 @@ export class SelectionScene extends Phaser.Scene {
       bg.clear();
       bg.fillStyle(0x333333, 1);
       bg.lineStyle(2, food.color, 1);
-      bg.fillRoundedRect(-250, -70, 500, 140, 15);
-      bg.strokeRoundedRect(-250, -70, 500, 140, 15);
+      bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+      bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
     });
 
     container.on('pointerout', () => {
@@ -112,8 +138,8 @@ export class SelectionScene extends Phaser.Scene {
       bg.clear();
       bg.fillStyle(0x222222, 1);
       bg.lineStyle(2, 0x444444, 1);
-      bg.fillRoundedRect(-250, -70, 500, 140, 15);
-      bg.strokeRoundedRect(-250, -70, 500, 140, 15);
+      bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+      bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
     });
 
     container.on('pointerup', () => {
