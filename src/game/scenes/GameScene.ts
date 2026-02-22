@@ -121,17 +121,16 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // Particles
+    // Dust
     this.dustEmitter = this.add.particles(0, 0, 'particle_puff', {
-      lifespan: 400,
-      scale: { start: 1, end: 0 },
+      scale: { start: 0.5, end: 0 },
       alpha: { start: 0.5, end: 0 },
-      speed: { min: 50, max: 150 },
-      angle: { min: -120, max: -60 },
-      gravityY: -200,
-      quantity: 1,
-      frequency: this.scale.width < 600 ? 100 : 50 // Less frequent particles on mobile
+      lifespan: 400,
+      gravityY: 0,
+      frequency: -1 // Manual emission
     });
+
+    this.createPremiumBeanTexture();
 
     // Player setup
     const playerX = centerX + CONSTS.LANE_POSITIONS[this.currentLane];
@@ -238,6 +237,41 @@ export class GameScene extends Phaser.Scene {
       if (this.isGameOver || this.playerState !== PlayerState.RUNNING) return;
       this.slide();
     });
+  }
+  private createPremiumBeanTexture() {
+    const g = this.make.graphics();
+    const brown = 0x8B4513;
+    const lightBrown = 0xA0522D;
+    const highlight = 0xFFFFFF;
+
+    // 1. Magical Aura (Outer Glow)
+    g.fillStyle(brown, 0.2);
+    g.fillCircle(32, 32, 30);
+    g.fillStyle(brown, 0.1);
+    g.fillCircle(32, 32, 35);
+
+    // 2. Bean Body (Curved Ellipse)
+    g.fillStyle(brown, 1);
+    // Draw a bean-like shape using two overlapping circles or a custom path
+    // For "cute" we use a slightly squashed and tilted ellipse
+    g.fillEllipse(32, 32, 45, 30);
+
+    // 3. Inner Detail / Shadow
+    g.fillStyle(lightBrown, 1);
+    g.fillEllipse(32, 35, 35, 20);
+
+    // 4. Glossy Highlight Arc (The "Cute" factor)
+    g.lineStyle(4, highlight, 0.6);
+    g.beginPath();
+    g.arc(28, 26, 15, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(280), false);
+    g.strokePath();
+
+    // 5. Secondary Highlight Spot
+    g.fillStyle(highlight, 0.4);
+    g.fillCircle(45, 35, 4);
+
+    g.generateTexture('bean_premium', 64, 64);
+    g.destroy();
   }
 
   private switchLane(newLane: LaneIndex) {
@@ -380,26 +414,36 @@ export class GameScene extends Phaser.Scene {
         const coin = this.coins.create(
           x,
           y - i * 80,
-          CONSTS.KEYS.COIN
+          'bean_premium'
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
-        coin.setScale(0.12); // Slightly larger for visibility
-        coin.setTint(0x8B4513); // Brown color for beans
-        // Removed ADD blend mode to make brown tint more visible
+        coin.setScale(1.2); // Procedural size is 64x64, 1.2 is a good "cute" size
 
-        // Rotating animation
+        // Expert "Cute" Animations: Floating + Squash & Stretch
         this.tweens.add({
           targets: coin,
-          angle: 360,
-          duration: 1000,
-          repeat: -1
+          y: '+=10',
+          duration: 1000 + Math.random() * 500,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
         });
 
-        // Pulsing animation
         this.tweens.add({
           targets: coin,
-          scale: 0.14,
-          duration: 400,
+          scaleX: 1.4,
+          scaleY: 1.0,
+          duration: 800 + Math.random() * 400,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
+
+        // Slow horizontal wiggle for organic feel
+        this.tweens.add({
+          targets: coin,
+          x: '+=5',
+          duration: 1500,
           yoyo: true,
           repeat: -1,
           ease: 'Sine.easeInOut'
