@@ -70,13 +70,29 @@ export class SelectionScene extends Phaser.Scene {
     bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
     container.add(bg);
 
-    // Food Icon (Procedural placeholder that looks like an icon)
+    // Food Icon (Premium Procedural Design)
+    const iconContainer = this.add.container(0, -100);
+
+    // Outer Glow / Shadow
+    const iconGlow = this.add.graphics();
+    iconGlow.fillStyle(Phaser.Display.Color.HexStringToColor(food.color).color, 0.2);
+    iconGlow.fillCircle(0, 0, 75);
+    iconContainer.add(iconGlow);
+
+    // Background Circle
     const iconBase = this.add.graphics();
-    iconBase.fillStyle(0x333333, 1);
-    iconBase.fillCircle(0, -100, 60);
-    iconBase.lineStyle(3, food.color, 1);
-    iconBase.strokeCircle(0, -100, 60);
-    container.add(iconBase);
+    iconBase.fillStyle(0x1a1a1a, 1);
+    iconBase.fillCircle(0, 0, 60);
+
+    // Inner Glow / Gradient Border
+    iconBase.lineStyle(4, Phaser.Display.Color.HexStringToColor(food.color).color, 1);
+    iconBase.strokeCircle(0, 0, 60);
+
+    // Top Highlight (Glass effect)
+    iconBase.fillStyle(0xffffff, 0.1);
+    iconBase.fillCircle(0, -20, 30);
+
+    iconContainer.add(iconBase);
 
     // Emoji or Symbol for icon
     const emojiMap: { [key: string]: string } = {
@@ -84,10 +100,13 @@ export class SelectionScene extends Phaser.Scene {
       onion: '🧅',
       chili: '🌶️'
     };
-    const iconEmoji = this.add.text(0, -100, emojiMap[food.id] || '❓', {
-      fontSize: '64px'
+    const iconEmoji = this.add.text(0, 0, emojiMap[food.id] || '❓', {
+      fontSize: '64px',
+      shadow: { offsetX: 0, offsetY: 0, color: food.color, blur: 15, stroke: true, fill: true }
     }).setOrigin(0.5);
-    container.add(iconEmoji);
+    iconContainer.add(iconEmoji);
+
+    container.add(iconContainer);
 
     // Food Name
     const nameText = this.add.text(0, -10, food.name, {

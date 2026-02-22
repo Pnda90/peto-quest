@@ -248,35 +248,52 @@ export class GameScene extends Phaser.Scene {
     const w = this.scale.width;
     const h = this.scale.height;
 
-    // Left side flora
-    this.floraLeft = this.add.particles(50, 0, 'particle_puff', {
-      x: { min: -50, max: 100 },
-      y: { min: 0, max: h },
-      scale: { min: 0.8, max: 2.0 },
-      tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 50,
-      lifespan: 1500,
-      speedY: { min: 50, max: 150 },
-      alpha: { min: 1.0, max: 1.0 }, // Fully solid
-      rotate: { min: 0, max: 360 },
-      blendMode: 'ADD' // Glowing effect
-    });
-    this.floraLeft.setDepth(10); // Far above background
+    // Create a procedural texture for the flora "blob"
+    const blobGraphics = this.make.graphics();
+    blobGraphics.fillStyle(0xffffff, 1);
+    blobGraphics.fillCircle(32, 32, 30);
+    blobGraphics.generateTexture('flora_blob', 64, 64);
+    blobGraphics.destroy();
 
-    // Right side flora
-    this.floraRight = this.add.particles(w - 50, 0, 'particle_puff', {
-      x: { min: w - 100, max: w + 50 },
+    // Left side flora
+    this.floraLeft = this.add.particles(50, 0, 'flora_blob', {
+      x: { min: -100, max: 120 },
       y: { min: 0, max: h },
-      scale: { min: 0.8, max: 2.0 },
+      scale: { start: 0.5, end: 1.5 },
+      alpha: { start: 0.2, end: 0.5 },
       tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 50,
-      lifespan: 1500,
-      speedY: { min: 50, max: 150 },
-      alpha: { min: 1.0, max: 1.0 },
+      frequency: 200, // Slower emission
+      lifespan: 4000,
+      speedY: { min: 30, max: 80 }, // Slower movement
       rotate: { min: 0, max: 360 },
       blendMode: 'ADD'
     });
-    this.floraRight.setDepth(10);
+    this.floraLeft.setDepth(5);
+
+    // Right side flora
+    this.floraRight = this.add.particles(w - 50, 0, 'flora_blob', {
+      x: { min: w - 120, max: w + 100 },
+      y: { min: 0, max: h },
+      scale: { start: 0.5, end: 1.5 },
+      alpha: { start: 0.2, end: 0.5 },
+      tint: [0x55ff55, 0x55ffff, 0xffff55],
+      frequency: 200,
+      lifespan: 4000,
+      speedY: { min: 30, max: 80 },
+      rotate: { min: 0, max: 360 },
+      blendMode: 'ADD'
+    });
+    this.floraRight.setDepth(5);
+
+    // Add pulsating effect to the emitters
+    this.tweens.add({
+      targets: [this.floraLeft, this.floraRight],
+      alpha: 0.8,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
   }
 
   private switchLane(newLane: LaneIndex) {
@@ -790,22 +807,36 @@ export class GameScene extends Phaser.Scene {
 
   private createChallengeUI() {
     const w = this.scale.width;
-    this.challengeContainer = this.add.container(w - 180, 100).setDepth(200);
+    // Lowered and centered horizontally for better readability
+    this.challengeContainer = this.add.container(w / 2, 180).setDepth(200);
 
+    // Glassmorphism background
     const bg = this.add.graphics();
-    bg.fillStyle(0x000000, 0.6);
-    bg.fillRoundedRect(-150, 0, 160, 50, 10);
-    bg.lineStyle(2, 0x00ff00, 1);
-    bg.strokeRoundedRect(-150, 0, 160, 50, 10);
+    bg.fillStyle(0x000000, 0.7);
+    bg.fillRoundedRect(-180, 0, 360, 70, 15);
+    bg.lineStyle(3, 0x00ff00, 1);
+    bg.strokeRoundedRect(-180, 0, 360, 70, 15);
     this.challengeContainer.add(bg);
 
-    this.challengeText = this.add.text(-140, 10, 'Missione...', {
-      fontSize: '14px',
-      color: '#00ff00',
+    // Glowing border effect
+    const glow = this.add.graphics();
+    glow.lineStyle(6, 0x00ff00, 0.3);
+    glow.strokeRoundedRect(-185, -5, 370, 80, 20);
+    this.challengeContainer.add(glow);
+
+    this.challengeText = this.add.text(0, 35, 'Missione...', {
+      fontSize: '22px', // Larger font
+      color: '#ffffff',
       fontStyle: 'bold',
-      wordWrap: { width: 140 }
-    });
+      align: 'center',
+      wordWrap: { width: 340 },
+      stroke: '#000',
+      strokeThickness: 4
+    }).setOrigin(0.5);
     this.challengeContainer.add(this.challengeText);
+
+    // Initial scale-in animation
+    this.challengeContainer.setScale(0);
   }
 
   private spawnNewChallenge() {
@@ -817,11 +848,19 @@ export class GameScene extends Phaser.Scene {
     const pick = types[Phaser.Math.Between(0, types.length - 1)];
     this.activeChallenge = { ...pick, progress: 0, description: pick.desc };
     this.updateChallengeUI();
+
+    // Show animation
+    this.tweens.add({
+      targets: this.challengeContainer,
+      scale: 1,
+      duration: 500,
+      ease: 'Back.easeOut'
+    });
   }
 
   private updateChallengeUI() {
     if (!this.activeChallenge) return;
-    this.challengeText.setText(`${this.activeChallenge.description}\n(${this.activeChallenge.progress}/${this.activeChallenge.goal})`);
+    this.challengeText.setText(`${this.activeChallenge.description.toUpperCase()}\n[ ${this.activeChallenge.progress} / ${this.activeChallenge.goal} ]`);
   }
 
   private progressChallenge(type: string, amount: number = 1) {
