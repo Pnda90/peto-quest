@@ -218,33 +218,41 @@ export class GameScene extends Phaser.Scene {
 
     const g = this.add.graphics();
     const mainColor = 0x8B4513; // Brown
+    const darkColor = 0x3b1f0f;
+    const lightColor = 0xd7a36a;
     const size = 64;
     const cx = size / 2;
     const cy = size / 2;
 
-    // 1. Outer Glow/Shadow
-    g.fillStyle(mainColor, 0.2);
-    g.fillCircle(cx, cy, 30);
+    g.clear();
 
-    // 2. Black Base (Like selection screen)
-    g.fillStyle(0x000000, 1);
-    g.fillCircle(cx, cy, 26);
+    g.fillStyle(0x000000, 0.25);
+    g.fillCircle(cx + 2, cy + 3, 28);
 
-    // 3. Brown Border
-    g.lineStyle(3, mainColor, 1);
-    g.strokeCircle(cx, cy, 26);
+    g.fillStyle(darkColor, 1);
+    g.fillCircle(cx, cy, 27);
 
-    // 4. Subtle Inner Highlight
-    g.lineStyle(1, 0xffffff, 0.2);
-    g.strokeCircle(cx, cy, 22);
-
-    // 5. Stylized Bean Silhouette (Mini version)
     g.fillStyle(mainColor, 1);
-    g.fillEllipse(cx, cy, 18, 12);
+    g.fillCircle(cx, cy, 25);
 
-    // Small Glossy Dot on Bean
-    g.fillStyle(0xffffff, 0.5);
-    g.fillCircle(cx - 5, cy - 3, 3);
+    g.lineStyle(2, 0xffffff, 0.18);
+    g.strokeCircle(cx, cy, 23);
+
+    g.fillStyle(0x000000, 0.35);
+    g.fillEllipse(cx + 1, cy + 7, 26, 16);
+
+    g.fillStyle(mainColor, 1);
+    g.fillEllipse(cx, cy + 2, 26, 16);
+    g.fillEllipse(cx + 6, cy - 1, 20, 14);
+
+    g.fillStyle(darkColor, 0.55);
+    g.fillEllipse(cx + 6, cy + 1, 14, 10);
+
+    g.lineStyle(2, 0x000000, 0.25);
+    g.strokeEllipse(cx, cy + 2, 26, 16);
+
+    g.fillStyle(lightColor, 0.6);
+    g.fillEllipse(cx - 4, cy - 1, 10, 6);
 
     g.generateTexture(key, size, size);
     g.destroy();
