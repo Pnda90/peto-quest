@@ -239,38 +239,45 @@ export class GameScene extends Phaser.Scene {
     });
   }
   private createPremiumBeanTexture() {
-    const g = this.make.graphics();
+    const key = 'bean_premium';
+    // Remove if exists to allow hot-reloading if necessary
+    if (this.textures.exists(key)) {
+      this.textures.remove(key);
+    }
+
+    const g = this.add.graphics();
     const brown = 0x8B4513;
     const lightBrown = 0xA0522D;
     const highlight = 0xFFFFFF;
 
-    // 1. Magical Aura (Outer Glow)
-    g.fillStyle(brown, 0.2);
-    g.fillCircle(32, 32, 30);
-    g.fillStyle(brown, 0.1);
-    g.fillCircle(32, 32, 35);
+    const cx = 32;
+    const cy = 32;
 
-    // 2. Bean Body (Curved Ellipse)
+    // 1. Magical Aura
+    g.fillStyle(brown, 0.3);
+    g.fillCircle(cx, cy, 30);
+    g.fillStyle(brown, 0.15);
+    g.fillCircle(cx, cy, 35);
+
+    // 2. Bean Body
     g.fillStyle(brown, 1);
-    // Draw a bean-like shape using two overlapping circles or a custom path
-    // For "cute" we use a slightly squashed and tilted ellipse
-    g.fillEllipse(32, 32, 45, 30);
+    g.fillEllipse(cx, cy, 45, 30);
 
-    // 3. Inner Detail / Shadow
+    // 3. Detail
     g.fillStyle(lightBrown, 1);
-    g.fillEllipse(32, 35, 35, 20);
+    g.fillEllipse(cx, cy + 3, 35, 20);
 
-    // 4. Glossy Highlight Arc (The "Cute" factor)
+    // 4. Glossy Highlight Arc
     g.lineStyle(4, highlight, 0.6);
     g.beginPath();
-    g.arc(28, 26, 15, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(280), false);
+    g.arc(cx - 4, cy - 6, 15, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(280), false);
     g.strokePath();
 
-    // 5. Secondary Highlight Spot
+    // 5. Highlight Spot
     g.fillStyle(highlight, 0.4);
-    g.fillCircle(45, 35, 4);
+    g.fillCircle(cx + 13, cy + 3, 4);
 
-    g.generateTexture('bean_premium', 64, 64);
+    g.generateTexture(key, 64, 64);
     g.destroy();
   }
 
@@ -417,18 +424,6 @@ export class GameScene extends Phaser.Scene {
           'bean_premium'
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
-        coin.setScale(1.2); // Procedural size is 64x64, 1.2 is a good "cute" size
-
-        // Expert "Cute" Animations: Floating + Squash & Stretch
-        this.tweens.add({
-          targets: coin,
-          y: '+=10',
-          duration: 1000 + Math.random() * 500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
-
         this.tweens.add({
           targets: coin,
           scaleX: 1.4,
