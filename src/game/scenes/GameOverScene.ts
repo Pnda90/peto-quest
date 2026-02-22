@@ -28,7 +28,7 @@ export class GameOverScene extends Phaser.Scene {
 
     // Game Over Title
     this.add
-      .text(w / 2, h / 3 - 50, 'GAME OVER', {
+      .text(w / 2, h / 3 - 50, 'PARTITA FINITA', {
         fontSize: '64px',
         color: '#ff2222',
         fontStyle: 'bold'
@@ -37,7 +37,7 @@ export class GameOverScene extends Phaser.Scene {
 
     // Stats
     this.add
-      .text(w / 2, h / 2 - 80, `Score: ${this.finalScore}`, {
+      .text(w / 2, h / 2 - 80, `Punteggio: ${this.finalScore}`, {
         fontSize: '32px',
         color: '#ffffff'
       })
@@ -45,7 +45,7 @@ export class GameOverScene extends Phaser.Scene {
 
     if (isNewHighScore) {
       const highscoreText = this.add
-        .text(w / 2, h / 2 - 40, `NEW HIGH SCORE!`, {
+        .text(w / 2, h / 2 - 40, `NUOVO RECORD!`, {
           fontSize: '24px',
           color: '#ffcc00',
           fontStyle: 'bold'
@@ -92,14 +92,14 @@ export class GameOverScene extends Phaser.Scene {
     }
 
     this.add
-      .text(w / 2, h / 2, `Distance: ${this.finalDistance}m`, {
+      .text(w / 2, h / 2, `Distanza: ${this.finalDistance}m`, {
         fontSize: '24px',
         color: '#aaaaaa'
       })
       .setOrigin(0.5);
 
     this.add
-      .text(w / 2, h / 2 + 40, `Beans Collected: +${this.finalCoins}`, {
+      .text(w / 2, h / 2 + 40, `Fagioli Raccolti: +${this.finalCoins}`, {
         fontSize: '24px',
         color: '#ffcc00'
       })
@@ -116,7 +116,7 @@ export class GameOverScene extends Phaser.Scene {
     btnBg.strokeRoundedRect(-150, -40, 300, 80, 16);
 
     const btnText = this.add
-      .text(0, 0, 'PLAY AGAIN', {
+      .text(0, 0, 'GIOCA ANCORA', {
         fontSize: '32px',
         fontStyle: 'bold',
         color: '#ffffff'
@@ -164,7 +164,7 @@ export class GameOverScene extends Phaser.Scene {
       return container;
     };
 
-    createSmallBtn(w / 2 - 80, h / 2 + 220, 'SHOP', CONSTS.SCENES.SHOP, 0xffaa00);
-    createSmallBtn(w / 2 + 80, h / 2 + 220, 'HOME', CONSTS.SCENES.MENU, 0x444444);
+    createSmallBtn(w / 2 - 80, h / 2 + 220, 'NEGOZIO', CONSTS.SCENES.SHOP, 0xffaa00);
+    createSmallBtn(w / 2 + 80, h / 2 + 220, 'INIZIO', CONSTS.SCENES.MENU, 0x444444);
   }
 }

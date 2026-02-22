@@ -1,24 +1,24 @@
-# Contributing to Peto Quest
+# Contribuire a Peto Quest
 
-First off, thanks for taking the time to contribute!
+Prima di tutto, grazie per aver dedicato del tempo a contribuire!
 
-## How to Contribute
+## Come Contribuire
 
-1. **Fork the repository** on GitHub.
-2. **Clone your fork** locally.
-3. **Create a branch** for your feature or bug fix: `git checkout -b my-new-feature`.
-4. **Follow the code style**: Run `npm run lint` (once configured) to ensure consistency.
-5. **Add tests**: If you're adding a new system, please add a corresponding test in `src/tests`.
-6. **Commit your changes**: Write clear, descriptive commit messages.
-7. **Push to your fork** and **submit a pull request**.
+1. **Fai un Fork della repository** su GitHub.
+2. **Clona il tuo fork** localmente.
+3. **Crea un branch** per la tua funzionalità o correzione: `git checkout -b mia-nuova-funzionalita`.
+4. **Segui lo stile del codice**: Esegui `npm run lint` (una volta configurato) per garantire la coerenza.
+5. **Aggiungi test**: Se stai aggiungendo un nuovo sistema, aggiungi un test corrispondente in `src/tests`.
+6. **Commit delle modifiche**: Scrivi messaggi di commit chiari e descrittivi.
+7. **Push sul tuo fork** e **invia una pull request**.
 
-## Development Tips
+## Consigli per lo Sviluppo
 
-- We use **Vite** for fast development.
-- The game engine is **Phaser 3**.
-- Logic is strictly typed with **TypeScript**.
-- We follow the **Vibe Coding Flow** — don't be afraid to use IA tools to help with your implementation!
+- Usiamo **Vite** per uno sviluppo veloce.
+- Il motore di gioco è **Phaser 3**.
+- La logica è strettamente tipizzata con **TypeScript**.
+- Seguiamo il **Vibe Coding Flow** — non aver paura di usare strumenti di IA per aiutarti nella tua implementazione!
 
 ---
 
-*Let's make Peto Quest even gassier!* 🌬️💨
+*Rendiamo Peto Quest ancora più... gassoso!* 🌬️💨

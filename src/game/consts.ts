@@ -64,13 +64,6 @@ export const CONSTS = {
       description: 'Digestione rapida per massima velocità.'
     },
     {
-      id: 'chili',
-      name: 'Peperoncino',
-      bonus: 'Turbo ++',
-      color: '#ff4400',
-      description: 'Poderose fiamme per un turbo duraturo.'
-    },
-    {
       id: 'onion',
       name: 'Cipolla',
       bonus: 'Magnete ++',
@@ -78,7 +71,6 @@ export const CONSTS = {
       description: 'Un odore così forte che attrae tutto.'
     }
   ],
-
   // Entity Keys
   KEYS: {
     COIN: 'item_coin',

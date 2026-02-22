@@ -22,7 +22,7 @@ export class SettingsScene extends Phaser.Scene {
 
     // Title
     this.add
-      .text(w / 2, 100, 'SETTINGS', {
+      .text(w / 2, 100, 'IMPOSTAZIONI', {
         fontSize: '48px',
         color: '#ffcc00',
         fontStyle: 'bold'
@@ -31,7 +31,7 @@ export class SettingsScene extends Phaser.Scene {
 
     // Sound Toggle Button
     const initData = SaveManager.getSaveData();
-    const soundLabel = initData.audioEnabled ? 'Sound: ON' : 'Sound: OFF';
+    const soundLabel = initData.audioEnabled ? 'Suono: SI' : 'Suono: NO';
     const soundColor = initData.audioEnabled ? '#00ff00' : '#ff2222';
 
     this.soundBtnText = this.add
@@ -46,7 +46,7 @@ export class SettingsScene extends Phaser.Scene {
     this.soundBtnText.on('pointerup', () => {
       const isMuted = this.audioSystem.toggleMute();
 
-      this.soundBtnText.setText(isMuted ? 'Sound: OFF' : 'Sound: ON');
+      this.soundBtnText.setText(isMuted ? 'Suono: NO' : 'Suono: SI');
       this.soundBtnText.setColor(isMuted ? '#ff2222' : '#00ff00');
 
       if (!isMuted) {
@@ -56,7 +56,7 @@ export class SettingsScene extends Phaser.Scene {
 
     // Back Button
     const backBtn = this.add
-      .text(w / 2, h - 100, '< BACK TO MENU', {
+      .text(w / 2, h - 100, '< TORNA AL MENU', {
         fontSize: '32px',
         color: '#aaaaaa',
         fontStyle: 'bold'

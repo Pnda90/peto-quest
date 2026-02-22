@@ -58,7 +58,7 @@ export class MenuScene extends Phaser.Scene {
     btnBg.strokeRoundedRect(-150, -40, 300, 80, 16);
 
     const btnText = this.add
-      .text(0, 0, 'PLAY NOW', {
+      .text(0, 0, 'GIOCA ORA', {
         fontSize: '32px',
         fontStyle: 'bold',
         color: '#ffffff'
@@ -117,7 +117,7 @@ export class MenuScene extends Phaser.Scene {
     shopBtnBg.strokeRoundedRect(-120, -30, 240, 60, 16);
 
     const shopBtnText = this.add
-      .text(0, 0, 'SHOP', {
+      .text(0, 0, 'NEGOZIO', {
         fontSize: '28px',
         fontStyle: 'bold',
         color: '#ffffff'
@@ -217,7 +217,7 @@ export class MenuScene extends Phaser.Scene {
 
     // Settings Button
     const settingsBtn = this.add
-      .text(w / 2, h - 130, '⚙️ Settings', {
+      .text(w / 2, h - 130, '⚙️ Impostazioni', {
         fontSize: '24px',
         color: '#aaaaaa'
       })
@@ -232,7 +232,7 @@ export class MenuScene extends Phaser.Scene {
 
     // Instructions
     this.add
-      .text(w / 2, h - 80, 'Arrows / WASD to move & jump\nSwipe on mobile', {
+      .text(w / 2, h - 80, 'Frecce / WASD per muoverti e saltare\nSwipe su mobile', {
         fontSize: '20px',
         color: '#aaaaaa',
         align: 'center'

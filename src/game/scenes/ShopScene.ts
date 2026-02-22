@@ -6,9 +6,9 @@ export class ShopScene extends Phaser.Scene {
   private beansText!: Phaser.GameObjects.Text;
 
   private skins = [
-    { id: 'default', name: 'Classic Gassy', price: 0, color: 0xffffff },
-    { id: 'toxic', name: 'Toxic Green', price: 100, color: 0xaa22ff }, // Using a different tint to simulate custom
-    { id: 'golden', name: 'Golden Wind', price: 500, color: 0xffdd00 }
+    { id: 'default', name: 'Gassoso Classico', price: 0, color: 0xffffff },
+    { id: 'toxic', name: 'Verde Tossico', price: 100, color: 0xaa22ff }, // Using a different tint to simulate custom
+    { id: 'golden', name: 'Vento D\'Oro', price: 500, color: 0xffdd00 }
   ];
 
   private upgrades: {
@@ -18,21 +18,21 @@ export class ShopScene extends Phaser.Scene {
     maxLevel: number;
     icon: string;
   }[] = [
-    {
-      id: 'invincibilityLevel',
-      name: 'Invincibility Duration',
-      basePrice: 200,
-      maxLevel: 5,
-      icon: CONSTS.KEYS.PWR_INVINCIBLE
-    },
-    {
-      id: 'magnetLevel',
-      name: 'Magnet Duration',
-      basePrice: 200,
-      maxLevel: 5,
-      icon: CONSTS.KEYS.PWR_MAGNET
-    }
-  ];
+      {
+        id: 'invincibilityLevel',
+        name: 'Durata Invincibilità',
+        basePrice: 200,
+        maxLevel: 5,
+        icon: CONSTS.KEYS.PWR_INVINCIBLE
+      },
+      {
+        id: 'magnetLevel',
+        name: 'Durata Magnete',
+        basePrice: 200,
+        maxLevel: 5,
+        icon: CONSTS.KEYS.PWR_MAGNET
+      }
+    ];
 
   constructor() {
     super(CONSTS.SCENES.SHOP);
@@ -48,7 +48,7 @@ export class ShopScene extends Phaser.Scene {
 
     // Title
     this.add
-      .text(w / 2, 80, 'THE BEAN SHOP', {
+      .text(w / 2, 80, 'IL NEGOZIO DEI FAGIOLI', {
         fontSize: '48px',
         color: '#ffcc00',
         fontStyle: 'bold'
@@ -57,7 +57,7 @@ export class ShopScene extends Phaser.Scene {
 
     // Current Beans
     this.beansText = this.add
-      .text(w / 2, 140, `Beans: ${SaveManager.getSaveData().coins}`, {
+      .text(w / 2, 140, `Fagioli: ${SaveManager.getSaveData().coins}`, {
         fontSize: '32px',
         color: '#ffffff'
       })
@@ -71,7 +71,7 @@ export class ShopScene extends Phaser.Scene {
 
     const upgradeTitleY = startY + this.skins.length * 120 + 40;
     this.add
-      .text(w / 2, upgradeTitleY, 'UPGRADES', {
+      .text(w / 2, upgradeTitleY, 'POTENZIAMENTI', {
         fontSize: '32px',
         color: '#ffcc00',
         fontStyle: 'bold'
@@ -111,7 +111,7 @@ export class ShopScene extends Phaser.Scene {
 
     // Back Button (fixed position using ScrollFactor)
     const backBtn = this.add
-      .text(w / 2, h - 80, '< BACK TO MENU', {
+      .text(w / 2, h - 80, '< TORNA AL MENU', {
         fontSize: '32px',
         color: '#aaaaaa',
         fontStyle: 'bold'
@@ -167,13 +167,13 @@ export class ShopScene extends Phaser.Scene {
     let statusColor = '#aaaaaa';
 
     if (isEquipped) {
-      statusTextStr = 'EQUIPPED';
+      statusTextStr = 'EQUIPAGGIATO';
       statusColor = '#00ff00';
     } else if (isUnlocked) {
-      statusTextStr = 'UNLOCKED - CLICK TO EQUIP';
+      statusTextStr = 'SBLOCCATO - CLICCA PER USARE';
       statusColor = '#ffffff';
     } else {
-      statusTextStr = `Price: ${skin.price} Beans`;
+      statusTextStr = `Prezzo: ${skin.price} Fagioli`;
       statusColor = '#ffcc00';
     }
 
@@ -265,7 +265,7 @@ export class ShopScene extends Phaser.Scene {
     container.add(nameText);
 
     // Status / Price
-    let statusTextStr = isMaxed ? 'MAX LEVEL' : `Upgrade: ${currentPrice} Beans`;
+    let statusTextStr = isMaxed ? 'LIVELLO MASSIMO' : `Upgrade: ${currentPrice} Fagioli`;
     let statusColor = isMaxed ? '#00ff00' : '#ffcc00';
 
     const statusText = this.add.text(-120, 10, statusTextStr, {

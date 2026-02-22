@@ -15,8 +15,7 @@ export const MISSIONS: Mission[] = [
     reward: 500
   },
   { id: 'reach_stomach', description: 'Raggiungi lo Stomaco', goal: 1, reward: 200 },
-  { id: 'reach_intestine_c', description: "Raggiungi l'Intestino Crasso", goal: 1, reward: 1000 },
-  { id: 'use_turbo_count', description: 'Attiva il Peto Turbo 10 volte', goal: 10, reward: 300 }
+  { id: 'reach_intestine_c', description: "Raggiungi l'Intestino Crasso", goal: 1, reward: 1000 }
 ];
 
 export class MissionManager {

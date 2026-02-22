@@ -35,13 +35,6 @@ export class GameScene extends Phaser.Scene {
   private comboTimer = 0;
   private isGameOver = false;
 
-  // Gassy Rush (Turbo)
-  private gasGauge = 0;
-  private maxGas = 100;
-  private isTurbo = false;
-  private turboDuration = 5000; // 5 seconds of glory
-  private normalSpeedBeforeTurbo = 0;
-
   // Biomes
   private currentBiomeIndex = 0;
   private lastBiomeDistance = 0;
@@ -60,9 +53,6 @@ export class GameScene extends Phaser.Scene {
   private distanceText!: Phaser.GameObjects.Text;
   private coinsText!: Phaser.GameObjects.Text;
   private multiplierText!: Phaser.GameObjects.Text;
-  private gasBarBg!: Phaser.GameObjects.Rectangle;
-  private gasBar!: Phaser.GameObjects.Rectangle;
-  private gasText!: Phaser.GameObjects.Text;
   private vignette!: Phaser.GameObjects.Graphics;
 
   constructor() {
@@ -82,21 +72,16 @@ export class GameScene extends Phaser.Scene {
     this.coinsCollected = 0;
     this.scoreMultiplier = 1;
     this.comboTimer = 0;
-    this.gasGauge = 0;
-    this.isTurbo = false;
     this.currentLane = 1;
     this.playerState = PlayerState.RUNNING;
     this.isSwitchingLane = false;
     this.isInvincible = false;
     this.isMagnet = false;
-    this.normalSpeedBeforeTurbo = 0;
     this.laneLines = [];
 
     // Apply Food Bonuses
     if (this.selectedFoodId === 'beans') {
       this.currentSpeed = CONSTS.BASE_SPEED * 1.2;
-    } else if (this.selectedFoodId === 'chili') {
-      this.turboDuration = 8000; // Longer turbo
     }
     // onion bonus is handled in magnet logic below
 
@@ -181,35 +166,19 @@ export class GameScene extends Phaser.Scene {
 
     // UI
     this.scoreText = this.add
-      .text(20, 20, 'Score: 0', { fontSize: '20px', color: '#fff' })
+      .text(20, 20, 'Punteggio: 0', { fontSize: '20px', color: '#fff' })
       .setDepth(100);
     this.multiplierText = this.add
       .text(20, 45, 'x1', { fontSize: '18px', color: '#ff8800' })
       .setDepth(100);
     this.coinsText = this.add
-      .text(w - 20, 50, 'Beans: 0', { fontSize: '20px', color: '#ffcc00' })
+      .text(w - 20, 50, 'Fagioli: 0', { fontSize: '20px', color: '#ffcc00' })
       .setOrigin(1, 0)
       .setDepth(100);
     this.distanceText = this.add
       .text(w - 20, 20, 'Dist: 0m', { fontSize: '20px', color: '#fff' })
       .setOrigin(1, 0)
       .setDepth(100);
-
-    // Gas Bar UI - Use Rectangles instead of Graphics to avoid redraws
-    this.gasBarBg = this.add.rectangle(w / 2, 30, 200, 20, 0x000000, 0.5).setDepth(101);
-    this.gasBar = this.add
-      .rectangle(w / 2 - 100, 30, 0, 20, 0x00ff00)
-      .setOrigin(0, 0.5)
-      .setDepth(102);
-
-    this.gasText = this.add
-      .text(w / 2, 45, 'GAS GAUGE', {
-        fontSize: '14px',
-        color: '#00ff00',
-        fontStyle: 'bold'
-      })
-      .setOrigin(0.5)
-      .setDepth(103);
 
     // Graphics for static UI elements like vignette
     this.vignette = this.add.graphics().setDepth(1000).setScrollFactor(0);
@@ -256,77 +225,6 @@ export class GameScene extends Phaser.Scene {
     this.events.on('input-down', () => {
       if (this.isGameOver || this.playerState !== PlayerState.RUNNING) return;
       this.slide();
-    });
-
-    // Turbo Activation (Space or Double Tap - we'll use Space for now or just check gas)
-    this.input.keyboard?.on('keydown-SPACE', () => {
-      if (this.gasGauge >= this.maxGas) {
-        this.activateTurbo();
-      }
-    });
-  }
-
-  private activateTurbo() {
-    if (this.isTurbo || this.isGameOver) return;
-
-    this.isTurbo = true;
-    this.isInvincible = true;
-    this.normalSpeedBeforeTurbo = this.currentSpeed;
-    this.currentSpeed *= 2.5; // Massive speedup
-    this.gasGauge = 0;
-
-    // Visual effects
-    this.vignette.setVisible(true);
-    this.invincibleGlow.setVisible(true);
-    this.cameras.main.flash(500, 0, 255, 0);
-    this.cameras.main.shake(200, 0.02);
-
-    // Enhance particles
-    this.dustEmitter.setConfig({
-      tint: [0x00ff00, 0xffffff],
-      frequency: 10,
-      speed: { min: 200, max: 400 }
-    });
-
-    // Powerup sound or special turbo sound
-    this.audioSystem.playPowerup();
-
-    // Mission tracking
-    SaveManager.updateMissionProgress('use_turbo_count', 1);
-    if (
-      MissionManager.checkMissionCompletion(
-        'use_turbo_count',
-        SaveManager.getMissionProgress('use_turbo_count')
-      )
-    ) {
-      this.showMissionComplete('Turbo Fan! (+300)');
-    }
-
-    this.time.delayedCall(this.turboDuration, () => {
-      this.deactivateTurbo();
-    });
-  }
-
-  private deactivateTurbo() {
-    if (!this.isTurbo || this.isGameOver) return;
-
-    this.isTurbo = false;
-    this.isInvincible = false;
-    this.currentSpeed = this.normalSpeedBeforeTurbo;
-    this.vignette.setVisible(false);
-    this.invincibleGlow.setVisible(false);
-
-    // Reset particles
-    this.player.clearTint();
-    // Re-apply skin tint if any
-    const equippedSkin = SaveManager.getSaveData().equippedSkin;
-    if (equippedSkin === 'toxic') this.player.setTint(0xaa22ff);
-    else if (equippedSkin === 'golden') this.player.setTint(0xffdd00);
-
-    this.dustEmitter.setConfig({
-      tint: 0xffffff,
-      frequency: 50,
-      speed: { min: 50, max: 150 }
     });
   }
 
@@ -484,11 +382,6 @@ export class GameScene extends Phaser.Scene {
     this.coinsCollected += CONSTS.COIN_VALUE;
     this.score += 10 * this.scoreMultiplier; // Bonus score for collecting
 
-    // Increase gas gauge
-    if (!this.isTurbo) {
-      this.gasGauge = Math.min(this.gasGauge + 5, this.maxGas);
-    }
-
     // Mission tracking
     SaveManager.updateMissionProgress('collect_beans_total', 1);
     if (
@@ -497,14 +390,14 @@ export class GameScene extends Phaser.Scene {
         SaveManager.getMissionProgress('collect_beans_total')
       )
     ) {
-      this.showMissionComplete('Bean Master! (+500)');
+      this.showMissionComplete('Maestro dei Fagioli! (+500)');
     }
 
     // Increase multiplier
     this.scoreMultiplier = Math.min(this.scoreMultiplier + 1, 10);
     this.comboTimer = 2000; // 2 seconds to keep combo
 
-    this.coinsText.setText(`Beans: ${this.coinsCollected}`);
+    this.coinsText.setText(`Fagioli: ${this.coinsCollected}`);
     this.multiplierText.setText(`x${this.scoreMultiplier}`);
     this.multiplierText.setVisible(this.scoreMultiplier > 1);
 
@@ -640,19 +533,6 @@ export class GameScene extends Phaser.Scene {
       this.transitionToNextStage();
     }
 
-    // Gas Bar Update
-    const gasFill = (this.gasGauge / this.maxGas) * 200;
-    this.gasBar.width = gasFill;
-
-    if (this.gasGauge >= this.maxGas) {
-      const alpha = 0.5 + Math.sin(time / 100) * 0.5;
-      this.gasBar.setFillStyle(0x00ff00, alpha);
-      this.gasText.setText('PRESS SPACE FOR TURBO!');
-    } else {
-      this.gasBar.setFillStyle(0x00ff00, 1);
-      this.gasText.setText('GAS GAUGE');
-    }
-
     // Combo Logic
     if (this.comboTimer > 0) {
       this.comboTimer -= delta;
@@ -667,7 +547,7 @@ export class GameScene extends Phaser.Scene {
     this.score += 10 * this.scoreMultiplier * (delta / 1000); // 10 pts per second * multiplier
 
     this.distanceText.setText(`Dist: ${Math.floor(this.distance)}m`);
-    this.scoreText.setText(`Score: ${Math.floor(this.score)}`);
+    this.scoreText.setText(`Punteggio: ${Math.floor(this.score)}`);
 
     // Spawning logic (items)
     this.itemSpawnTimer -= delta;
@@ -773,11 +653,11 @@ export class GameScene extends Phaser.Scene {
     // Mission tracking
     if (stage.name === 'Stomaco') {
       if (MissionManager.checkMissionCompletion('reach_stomach', 1)) {
-        this.showMissionComplete('Stomach Reached! (+200)');
+        this.showMissionComplete('Stomaco Raggiunto! (+200)');
       }
     } else if (stage.name === 'Intestino Crasso') {
       if (MissionManager.checkMissionCompletion('reach_intestine_c', 1)) {
-        this.showMissionComplete('Large Intestine! (+1000)');
+        this.showMissionComplete('Intestino Crasso! (+1000)');
       }
     }
 

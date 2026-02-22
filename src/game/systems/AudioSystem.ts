@@ -203,9 +203,14 @@ export class AudioSystem {
         this.playNoise(0.2);
         break;
       case 'end':
-        this.playTone(100, 60, 0.4, 'sawtooth');
-        this.playTone(60, 40, 0.4, 'sawtooth');
-        this.playNoise(0.3);
+        this.playMultipleTones(
+          [
+            { freqStart: 440, freqEnd: 660, duration: 0.1 },
+            { freqStart: 660, freqEnd: 880, duration: 0.1 }
+          ],
+          'sine'
+        );
+        this.playNoise(0.1);
         break;
       case 'gameover':
         this.playTone(80, 40, 0.6, 'sawtooth');

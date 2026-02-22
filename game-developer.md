@@ -160,7 +160,8 @@ Assets/
 │   ├── MainMenu.unity
 │   ├── Gameplay.unity
 │   └── Loading.unity
-└── Resources/ | Addressables/
+### Risorse / Addressables
+```
 ```
 
 ## Stack Tecnologico
