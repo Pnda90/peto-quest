@@ -78,8 +78,13 @@ export class AudioSystem {
   }
 
   private prepareNoiseBuffer() {
-    // We'll do this when context is available, or just create a temporary one if needed
-    // But better to wait for AudioContext
+    if (!this.audioCtx) return;
+    const bufferSize = this.audioCtx.sampleRate * 2; // 2 seconds of noise
+    this.noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
+    const data = this.noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
   }
 
   public toggleMute(): boolean {
@@ -222,6 +227,35 @@ export class AudioSystem {
     }
   }
 
+  public playCheer(intensity: number = 0.5) {
+    if (this.isMuted || !this.audioCtx || intensity <= 0) return;
+
+    if (!this.noiseBuffer) this.prepareNoiseBuffer();
+    if (!this.noiseBuffer) return;
+
+    const source = this.audioCtx.createBufferSource();
+    source.buffer = this.noiseBuffer;
+    source.loop = true;
+
+    const bandpass = this.audioCtx.createBiquadFilter();
+    bandpass.type = 'bandpass';
+    bandpass.frequency.value = 1000 + intensity * 500;
+    bandpass.Q.value = 1;
+
+    const gainNode = this.audioCtx.createGain();
+    const vol = Math.min(intensity * 0.15, 0.2); // Cap at 0.2
+    gainNode.gain.setValueAtTime(0, this.audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(vol, this.audioCtx.currentTime + 0.1);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 1.5);
+
+    source.connect(bandpass);
+    bandpass.connect(gainNode);
+    gainNode.connect(this.audioCtx.destination);
+
+    source.start();
+    source.stop(this.audioCtx.currentTime + 1.5);
+  }
+
   // Helper to play simple synthesized tones
   private playTone(
     freqStart: number,
@@ -296,13 +330,9 @@ export class AudioSystem {
     if (!this.audioCtx) return;
 
     if (!this.noiseBuffer) {
-      const bufferSize = this.audioCtx.sampleRate * 2; // 2 seconds of noise
-      this.noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
-      const data = this.noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      this.prepareNoiseBuffer();
     }
+    if (!this.noiseBuffer) return;
 
     const noise = this.audioCtx.createBufferSource();
     noise.buffer = this.noiseBuffer;

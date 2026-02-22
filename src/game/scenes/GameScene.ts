@@ -44,6 +44,11 @@ export class GameScene extends Phaser.Scene {
   private isMagnet = false;
   private invincibleGlow!: Phaser.GameObjects.Image;
 
+  // Audience
+  private floraLeft!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private floraRight!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private nextCheerTime = 0;
+
   // Timers
   private obstacleSpawnTimer = 0;
   private itemSpawnTimer = 0;
@@ -112,6 +117,8 @@ export class GameScene extends Phaser.Scene {
         this.laneLines.push(line);
       }
     }
+
+    this.createFloraAudience();
 
     // Particles
     this.dustEmitter = this.add.particles(0, 0, 'particle_puff', {
@@ -225,6 +232,37 @@ export class GameScene extends Phaser.Scene {
     this.events.on('input-down', () => {
       if (this.isGameOver || this.playerState !== PlayerState.RUNNING) return;
       this.slide();
+    });
+  }
+
+  private createFloraAudience() {
+    const w = this.scale.width;
+    const h = this.scale.height;
+
+    // Left side flora
+    this.floraLeft = this.add.particles(50, 0, 'particle_puff', {
+      x: { min: 0, max: 100 },
+      y: { min: 0, max: h },
+      scale: { min: 0.5, max: 1.2 },
+      alpha: { min: 0.3, max: 0.6 },
+      tint: [0x55ff55, 0x55ffff, 0xffff55],
+      frequency: 200,
+      lifespan: 2000,
+      speedY: { min: 50, max: 150 },
+      rotate: { min: 0, max: 360 }
+    });
+
+    // Right side flora
+    this.floraRight = this.add.particles(w - 50, 0, 'particle_puff', {
+      x: { min: w - 100, max: w },
+      y: { min: 0, max: h },
+      scale: { min: 0.5, max: 1.2 },
+      alpha: { min: 0.3, max: 0.6 },
+      tint: [0x55ff55, 0x55ffff, 0xffff55],
+      frequency: 200,
+      lifespan: 2000,
+      speedY: { min: 50, max: 150 },
+      rotate: { min: 0, max: 360 }
     });
   }
 
@@ -382,6 +420,16 @@ export class GameScene extends Phaser.Scene {
     this.coinsCollected += CONSTS.COIN_VALUE;
     this.score += 10 * this.scoreMultiplier; // Bonus score for collecting
 
+    // Cheering based on combo
+    if (this.scoreMultiplier > 1 && this.time.now > this.nextCheerTime) {
+      this.audioSystem.playCheer(this.scoreMultiplier * 0.2);
+      this.nextCheerTime = this.time.now + 1000;
+
+      // Visual reaction from audience
+      this.floraLeft.emitParticle(5);
+      this.floraRight.emitParticle(5);
+    }
+
     // Mission tracking
     SaveManager.updateMissionProgress('collect_beans_total', 1);
     if (
@@ -536,9 +584,17 @@ export class GameScene extends Phaser.Scene {
     // Combo Logic
     if (this.comboTimer > 0) {
       this.comboTimer -= delta;
+
+      // Move audience based on combo
+      const intensity = this.scoreMultiplier > 1 ? 2 : 1;
+      this.floraLeft.setConfig({ frequency: 200 / intensity });
+      this.floraRight.setConfig({ frequency: 200 / intensity });
+
       if (this.comboTimer <= 0) {
         this.scoreMultiplier = 1;
         this.multiplierText.setVisible(false);
+        this.floraLeft.setConfig({ frequency: 200 });
+        this.floraRight.setConfig({ frequency: 200 });
       }
     }
 
