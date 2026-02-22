@@ -97,8 +97,8 @@ export class GameScene extends Phaser.Scene {
     // Backgrounds (Parallax)
     const w = this.scale.width;
     const h = this.scale.height;
-    this.bg1 = this.add.tileSprite(w / 2, h / 2, w, h, 'bg_layer_1');
-    this.bg2 = this.add.tileSprite(w / 2, h / 2, w, h, 'bg_layer_2');
+    this.bg1 = this.add.tileSprite(w / 2, h / 2, w, h, 'bg_layer_1').setDepth(-2);
+    this.bg2 = this.add.tileSprite(w / 2, h / 2, w, h, 'bg_layer_2').setDepth(-1);
 
     // Draw Lane Lines
     const centerX = this.scale.width / 2;
@@ -244,26 +244,28 @@ export class GameScene extends Phaser.Scene {
       x: { min: 0, max: 100 },
       y: { min: 0, max: h },
       scale: { min: 0.5, max: 1.2 },
-      alpha: { min: 0.3, max: 0.6 },
       tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 200,
+      frequency: 100,
       lifespan: 2000,
-      speedY: { min: 50, max: 150 },
+      speedY: { min: 20, max: 80 },
+      alpha: { min: 0.6, max: 0.9 },
       rotate: { min: 0, max: 360 }
     });
+    this.floraLeft.setDepth(1);
 
     // Right side flora
     this.floraRight = this.add.particles(w - 50, 0, 'particle_puff', {
       x: { min: w - 100, max: w },
       y: { min: 0, max: h },
       scale: { min: 0.5, max: 1.2 },
-      alpha: { min: 0.3, max: 0.6 },
       tint: [0x55ff55, 0x55ffff, 0xffff55],
-      frequency: 200,
+      frequency: 100,
       lifespan: 2000,
-      speedY: { min: 50, max: 150 },
+      speedY: { min: 20, max: 80 },
+      alpha: { min: 0.6, max: 0.9 },
       rotate: { min: 0, max: 360 }
     });
+    this.floraRight.setDepth(1);
   }
 
   private switchLane(newLane: LaneIndex) {
@@ -406,6 +408,7 @@ export class GameScene extends Phaser.Scene {
           CONSTS.KEYS.COIN
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
+        coin.setScale(0.1); // Scale down 640x640 asset to 64x64
       }
     }
   }
@@ -587,14 +590,14 @@ export class GameScene extends Phaser.Scene {
 
       // Move audience based on combo
       const intensity = this.scoreMultiplier > 1 ? 2 : 1;
-      this.floraLeft.setConfig({ frequency: 200 / intensity });
-      this.floraRight.setConfig({ frequency: 200 / intensity });
+      this.floraLeft.setConfig({ frequency: 100 / intensity });
+      this.floraRight.setConfig({ frequency: 100 / intensity });
 
       if (this.comboTimer <= 0) {
         this.scoreMultiplier = 1;
         this.multiplierText.setVisible(false);
-        this.floraLeft.setConfig({ frequency: 200 });
-        this.floraRight.setConfig({ frequency: 200 });
+        this.floraLeft.setConfig({ frequency: 100 });
+        this.floraRight.setConfig({ frequency: 100 });
       }
     }
 
