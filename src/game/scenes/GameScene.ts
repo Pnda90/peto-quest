@@ -45,8 +45,6 @@ export class GameScene extends Phaser.Scene {
   private invincibleGlow!: Phaser.GameObjects.Image;
 
   // Audience
-  private floraLeft!: Phaser.GameObjects.Particles.ParticleEmitter;
-  private floraRight!: Phaser.GameObjects.Particles.ParticleEmitter;
   private nextCheerTime = 0;
 
   // Dynamic Missions
@@ -122,8 +120,6 @@ export class GameScene extends Phaser.Scene {
         this.laneLines.push(line);
       }
     }
-
-    this.createFloraAudience();
 
     // Particles
     this.dustEmitter = this.add.particles(0, 0, 'particle_puff', {
@@ -241,63 +237,6 @@ export class GameScene extends Phaser.Scene {
     this.events.on('input-down', () => {
       if (this.isGameOver || this.playerState !== PlayerState.RUNNING) return;
       this.slide();
-    });
-  }
-
-  private createFloraAudience() {
-    const w = this.scale.width;
-    const h = this.scale.height;
-
-    // Create a high-quality procedural texture for the flora "blob"
-    const blobGraphics = this.make.graphics();
-    // Inner glows and outer glows
-    blobGraphics.fillStyle(0xffffff, 0.4);
-    blobGraphics.fillCircle(32, 32, 30);
-    blobGraphics.fillStyle(0xffffff, 1);
-    blobGraphics.fillCircle(32, 32, 10);
-    blobGraphics.generateTexture('flora_blob', 64, 64);
-    blobGraphics.destroy();
-
-    // Left side flora - Emitter config for organic drift
-    this.floraLeft = this.add.particles(50, 0, 'flora_blob', {
-      x: { min: -150, max: 150 },
-      y: { min: -100, max: h + 100 },
-      scale: { start: 0.8, end: 2.5 },
-      alpha: { start: 0.1, end: 0.4 },
-      tint: [0x55ff55, 0x55ffff, 0xaaaaff],
-      frequency: 400, // Slower emission
-      lifespan: 8000,
-      speedY: { min: 40, max: 100 },
-      speedX: { min: -20, max: 20 },
-      rotate: { min: 0, max: 360 },
-      blendMode: 'ADD'
-    });
-    this.floraLeft.setDepth(5);
-
-    // Right side flora
-    this.floraRight = this.add.particles(w - 50, 0, 'flora_blob', {
-      x: { min: w - 150, max: w + 150 },
-      y: { min: -100, max: h + 100 },
-      scale: { start: 0.8, end: 2.5 },
-      alpha: { start: 0.1, end: 0.4 },
-      tint: [0x55ff55, 0x55ffff, 0xaaaaff],
-      frequency: 400,
-      lifespan: 8000,
-      speedY: { min: 40, max: 100 },
-      speedX: { min: -20, max: 20 },
-      rotate: { min: 0, max: 360 },
-      blendMode: 'ADD'
-    });
-    this.floraRight.setDepth(5);
-
-    // Add pulsating effect to the emitters
-    this.tweens.add({
-      targets: [this.floraLeft, this.floraRight],
-      alpha: 0.8,
-      duration: 2000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
     });
   }
 
@@ -483,10 +422,6 @@ export class GameScene extends Phaser.Scene {
     if (this.scoreMultiplier > 1 && this.time.now > this.nextCheerTime) {
       this.audioSystem.playCheer(this.scoreMultiplier * 0.2);
       this.nextCheerTime = this.time.now + 1000;
-
-      // Visual reaction from audience
-      this.floraLeft.emitParticle(5);
-      this.floraRight.emitParticle(5);
     }
 
     // Mission tracking
@@ -645,16 +580,11 @@ export class GameScene extends Phaser.Scene {
     if (this.comboTimer > 0) {
       this.comboTimer -= delta;
 
-      // Move audience based on combo
-      const intensity = this.scoreMultiplier > 1 ? 2 : 1;
-      this.floraLeft.setConfig({ frequency: 100 / intensity });
-      this.floraRight.setConfig({ frequency: 100 / intensity });
+      // Move audience based on combo (Removed in Round 5)
 
       if (this.comboTimer <= 0) {
         this.scoreMultiplier = 1;
         this.multiplierText.setVisible(false);
-        this.floraLeft.setConfig({ frequency: 100 });
-        this.floraRight.setConfig({ frequency: 100 });
       }
     }
 

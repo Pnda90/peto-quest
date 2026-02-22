@@ -60,7 +60,7 @@ export const CONSTS = {
       id: 'beans',
       name: 'Fagioli Magici',
       bonus: 'Velocità +',
-      color: '#00ff00',
+      color: '#8B4513',
       description: 'Digestione rapida per massima velocità.'
     },
     {
