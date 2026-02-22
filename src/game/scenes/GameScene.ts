@@ -130,8 +130,6 @@ export class GameScene extends Phaser.Scene {
       frequency: -1 // Manual emission
     });
 
-    this.createPremiumBeanTexture();
-
     // Player setup
     const playerX = centerX + CONSTS.LANE_POSITIONS[this.currentLane];
     const playerY = this.scale.height - 250;
@@ -237,48 +235,6 @@ export class GameScene extends Phaser.Scene {
       if (this.isGameOver || this.playerState !== PlayerState.RUNNING) return;
       this.slide();
     });
-  }
-  private createPremiumBeanTexture() {
-    const key = 'bean_premium';
-    // Remove if exists to allow hot-reloading if necessary
-    if (this.textures.exists(key)) {
-      this.textures.remove(key);
-    }
-
-    const g = this.add.graphics();
-    const brown = 0x8B4513;
-    const lightBrown = 0xA0522D;
-    const highlight = 0xFFFFFF;
-
-    const cx = 32;
-    const cy = 32;
-
-    // 1. Magical Aura
-    g.fillStyle(brown, 0.3);
-    g.fillCircle(cx, cy, 30);
-    g.fillStyle(brown, 0.15);
-    g.fillCircle(cx, cy, 35);
-
-    // 2. Bean Body
-    g.fillStyle(brown, 1);
-    g.fillEllipse(cx, cy, 45, 30);
-
-    // 3. Detail
-    g.fillStyle(lightBrown, 1);
-    g.fillEllipse(cx, cy + 3, 35, 20);
-
-    // 4. Glossy Highlight Arc
-    g.lineStyle(4, highlight, 0.6);
-    g.beginPath();
-    g.arc(cx - 4, cy - 6, 15, Phaser.Math.DegToRad(200), Phaser.Math.DegToRad(280), false);
-    g.strokePath();
-
-    // 5. Highlight Spot
-    g.fillStyle(highlight, 0.4);
-    g.fillCircle(cx + 13, cy + 3, 4);
-
-    g.generateTexture(key, 64, 64);
-    g.destroy();
   }
 
   private switchLane(newLane: LaneIndex) {
@@ -421,27 +377,18 @@ export class GameScene extends Phaser.Scene {
         const coin = this.coins.create(
           x,
           y - i * 80,
-          'bean_premium'
+          CONSTS.KEYS.COIN
         ) as Phaser.Physics.Arcade.Sprite;
         coin.setVelocityY(this.currentSpeed);
-        this.tweens.add({
-          targets: coin,
-          scaleX: 1.4,
-          scaleY: 1.0,
-          duration: 800 + Math.random() * 400,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
+        coin.setScale(0.12);
+        coin.setTint(0x8B4513); // Brown tint for beans
 
-        // Slow horizontal wiggle for organic feel
+        // Simple rotation as before
         this.tweens.add({
           targets: coin,
-          x: '+=5',
-          duration: 1500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
+          angle: 360,
+          duration: 1000,
+          repeat: -1
         });
       }
     }
