@@ -36,11 +36,11 @@ export class SelectionScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    // Render Food Options in 3 columns
+    // Render Food Options in 3 columns - Expert Layout
     const spacing = 260;
     const startX = w / 2 - spacing;
     CONSTS.FOODS.forEach((food, index) => {
-      this.createFoodItem(startX + index * spacing, h / 2, food);
+      this.createFoodItem(startX + index * spacing, h / 2 + 50, food);
     });
 
     // Back Button
@@ -60,105 +60,132 @@ export class SelectionScene extends Phaser.Scene {
   private createFoodItem(x: number, y: number, food: any) {
     const container = this.add.container(x, y);
     const cardW = 240;
-    const cardH = 380;
+    const cardH = 420;
 
-    // Card Bg
+    // Card Background Layer 1: Outer Shadow
+    const shadow = this.add.graphics();
+    shadow.fillStyle(0x000000, 0.4);
+    shadow.fillRoundedRect(-cardW / 2 + 5, -cardH / 2 + 10, cardW, cardH, 20);
+    container.add(shadow);
+
+    // Card Background Layer 2: Main Body (Glass)
     const bg = this.add.graphics();
-    bg.fillStyle(0x222222, 1);
-    bg.lineStyle(2, 0x444444, 1);
-    bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
-    bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+    const mainColor = Phaser.Display.Color.HexStringToColor(food.color).color;
+
+    const drawCard = (hover: boolean) => {
+      bg.clear();
+      // Subtle gradient effect simulated with multiple fills or just a base
+      bg.fillStyle(hover ? 0x2a2a2a : 0x1a1a1a, 0.9);
+      bg.lineStyle(2, hover ? mainColor : 0x333333, 1);
+      bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 20);
+      bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 20);
+
+      // Top Highlight
+      bg.lineStyle(1, 0xffffff, 0.1);
+      bg.strokeRoundedRect(-cardW / 2 + 5, -cardH / 2 + 5, cardW - 10, cardH / 2, 15);
+    };
+    drawCard(false);
     container.add(bg);
 
-    // Food Icon (Premium Procedural Design)
-    const iconContainer = this.add.container(0, -100);
+    // Food Icon (Expert Procedural Badge)
+    const iconContainer = this.add.container(0, -110);
 
-    // Outer Glow / Shadow
-    const iconGlow = this.add.graphics();
-    iconGlow.fillStyle(Phaser.Display.Color.HexStringToColor(food.color).color, 0.2);
-    iconGlow.fillCircle(0, 0, 75);
-    iconContainer.add(iconGlow);
+    // 1. Outer Glow Ring
+    const outerRing = this.add.graphics();
+    outerRing.lineStyle(4, mainColor, 0.2);
+    outerRing.strokeCircle(0, 0, 80);
+    iconContainer.add(outerRing);
 
-    // Background Circle
+    // 2. Main Circle with Gradient-like feel
     const iconBase = this.add.graphics();
-    iconBase.fillStyle(0x1a1a1a, 1);
-    iconBase.fillCircle(0, 0, 60);
+    iconBase.fillStyle(0x000000, 1);
+    iconBase.fillCircle(0, 0, 65);
+    iconBase.lineStyle(3, mainColor, 1);
+    iconBase.strokeCircle(0, 0, 65);
 
-    // Inner Glow / Gradient Border
-    iconBase.lineStyle(4, Phaser.Display.Color.HexStringToColor(food.color).color, 1);
-    iconBase.strokeCircle(0, 0, 60);
-
-    // Top Highlight (Glass effect)
-    iconBase.fillStyle(0xffffff, 0.1);
-    iconBase.fillCircle(0, -20, 30);
-
+    // 3. Inner Glow
+    iconBase.lineStyle(1, 0xffffff, 0.2);
+    iconBase.strokeCircle(0, 0, 58);
     iconContainer.add(iconBase);
 
-    // Emoji or Symbol for icon
+    // 4. Emoji with Dynamic Shadow
     const emojiMap: { [key: string]: string } = {
       beans: '🫘',
       onion: '🧅',
       chili: '🌶️'
     };
     const iconEmoji = this.add.text(0, 0, emojiMap[food.id] || '❓', {
-      fontSize: '64px',
-      shadow: { offsetX: 0, offsetY: 0, color: food.color, blur: 15, stroke: true, fill: true }
+      fontSize: '72px',
+      shadow: { color: food.color, blur: 20, fill: true, stroke: true }
     }).setOrigin(0.5);
     iconContainer.add(iconEmoji);
 
     container.add(iconContainer);
 
+    // Pulsing animation for the icon on hover (assigned later)
+    const iconTween = this.tweens.add({
+      targets: iconContainer,
+      scale: 1.1,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      paused: true
+    });
+
     // Food Name
-    const nameText = this.add.text(0, -10, food.name, {
-      fontSize: '24px',
-      color: food.color,
+    const nameText = this.add.text(0, 20, food.name.toUpperCase(), {
+      fontSize: '26px',
+      color: '#ffffff',
       fontStyle: 'bold',
       align: 'center',
-      wordWrap: { width: cardW - 20 }
+      wordWrap: { width: cardW - 20 },
+      stroke: '#000',
+      strokeThickness: 4
     }).setOrigin(0.5, 0);
     container.add(nameText);
 
-    // Bonus Tag
-    const bonusText = this.add
-      .text(0, 50, food.bonus, {
-        fontSize: '16px',
-        color: '#000',
-        backgroundColor: food.color,
-        padding: { x: 8, y: 4 },
-        fontStyle: 'bold'
-      })
-      .setOrigin(0.5, 0);
-    container.add(bonusText);
-
     // Description
     const descText = this.add.text(0, 100, food.description, {
-      fontSize: '14px',
-      color: '#aaaaaa',
+      fontSize: '15px',
+      color: '#888888',
       wordWrap: { width: cardW - 40 },
-      align: 'center'
+      align: 'center',
+      fontStyle: 'italic'
     }).setOrigin(0.5, 0);
     container.add(descText);
+
+    // Bonus Tag (Modern Badge Style)
+    const bonusContainer = this.add.container(0, 220);
+    const bonusBg = this.add.graphics();
+    bonusBg.fillStyle(mainColor, 1);
+    bonusBg.fillRoundedRect(-80, -20, 160, 40, 10);
+    bonusContainer.add(bonusBg);
+
+    const bonusText = this.add.text(0, 0, food.bonus, {
+      fontSize: '16px',
+      color: '#000',
+      fontStyle: 'bold'
+    }).setOrigin(0.5);
+    bonusContainer.add(bonusText);
+    container.add(bonusContainer);
 
     // Interaction
     container.setSize(cardW, cardH);
     container.setInteractive({ useHandCursor: true });
 
     container.on('pointerover', () => {
-      this.tweens.add({ targets: container, scale: 1.05, duration: 100 });
-      bg.clear();
-      bg.fillStyle(0x333333, 1);
-      bg.lineStyle(2, food.color, 1);
-      bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
-      bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+      this.tweens.add({ targets: container, y: y - 10, scale: 1.02, duration: 200, ease: 'Cubic.easeOut' });
+      drawCard(true);
+      iconTween.play();
+      outerRing.alpha = 0.8;
     });
 
     container.on('pointerout', () => {
-      this.tweens.add({ targets: container, scale: 1, duration: 100 });
-      bg.clear();
-      bg.fillStyle(0x222222, 1);
-      bg.lineStyle(2, 0x444444, 1);
-      bg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
-      bg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 15);
+      this.tweens.add({ targets: container, y: y, scale: 1, duration: 200, ease: 'Cubic.easeIn' });
+      drawCard(false);
+      iconTween.pause();
+      iconContainer.setScale(1);
+      outerRing.alpha = 1;
     });
 
     container.on('pointerup', () => {
