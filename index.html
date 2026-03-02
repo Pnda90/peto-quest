@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Peto Quest" />
+  <title>Peto Quest | L'Avventura Gassosa Definitiva</title>
+  <meta name="description"
+    content="Corri, salta e scorreggia attraverso il sistema digestivo in questo frenetico endless runner sviluppato con Vibe Coding e AgentiPRO.">
+
+  <!-- Google Font: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://peto-quest.vercel.app/">
+  <meta property="og:title" content="Peto Quest | L'Avventura Gassosa Definitiva">
+  <meta property="og:description"
+    content="Un'esperienza arcade premium nata dal potere dell'IA. Sblocca skin, potenziamenti e scala la classifica!">
+  <meta property="og:image" content="/icons/icon-512.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://peto-quest.vercel.app/">
+  <meta property="twitter:title" content="Peto Quest | L'Avventura Gassosa Definitiva">
+  <meta property="twitter:description" content="Divertimento puro chiptune al 100%. Creato con AgentiPRO.">
+  <meta property="twitter:image" content="/icons/icon-512.png">
+
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #111;
+      overflow: hidden;
+      /* Prevent scrolling on mobile */
+      touch-action: none;
+      /* Prevent default touch actions like pull-to-refresh */
+    }
+
+    #game-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-container"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
