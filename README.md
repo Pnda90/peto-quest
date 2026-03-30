@@ -52,21 +52,6 @@ npm run build
 
 Il gioco utilizza un mix di grafiche generate proceduralmente e sprite personalizzati situati in `public/assets`. Gli effetti sonori sono generati a runtime via codice.
 
-## 📱 Come Pubblicare (Gratis su iPhone)
-
-Il gioco è configurato come **PWA** (Progressive Web App).
-
-1. **Deploy su Vercel (Consigliato)**:
-   - Vai su [Vercel.com](https://vercel.com) e crea un account gratuito.
-   - Trascina questa cartella nel loro dashboard o collegala via GitHub.
-   - Il file `vercel.json` che ho creato gestirà tutto automaticamente.
-2. **Installazione su iPhone**:
-   - Apri l'URL generato da Vercel su **Safari**.
-   - Tocca l'icona **Condividi** (il quadrato con la freccia).
-   - Seleziona **"Aggiungi alla schermata Home"**.
-
----
-
 ## 🧘‍♂️ Vibe Coding Flow
 
 Questo progetto è un esempio di **Vibe Coding Flow**, un approccio moderno allo sviluppo software dove la visione creativa viene tradotta in codice attraverso una collaborazione fluida tra lo sviluppatore e l'Intelligenza Artificiale.
